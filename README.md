@@ -1,22 +1,32 @@
 # ssh-jumphost
 
-Re-work of warden/docker-jumphost which is an extended Docker image to run an SSH server.
+Re-work of t3n/docker-ssh-jump which is an extended Docker image to run an SSH server.
+Added support for setting the authorized keys via environment variables.
 
-Expected volumes:
-* publickeys:/keys 
+## Configuration:
 
-USAGE:
+### Environment:
+
+- USER - comma separated list of usernames to create, default if not set is `jump`
+- AUTH*KEY_0 .. AUTH_KEY_9 - public keys to add to \_authorized_keys*
+
+### Volumes:
+
+A directory containing files with public keys can be mounted under /keys/. All files there will be appended to _authorized_keys_
+
+- publickeys:/keys
+
+## Usage examples:
+
+### With public keys directory:
+
+```sh
+docker run --name ssh_server -d -e USER=`whoami` -v ~/.ssh/pubkeys:/keys ghcr.io/zaro/docker-ssh-jump
 ```
-docker run --name ssh_server -d -e USER=`whoami` -v ~/.ssh/pubkeys:/keys geekinutah/ssh-jumphost
-```
 
-where:
-* USER - username allowed to log in
-* ~/.ssh/pubkeys/ - path containing desired public keys
+### With public keys from env:
 
-The modificaitons made to warden/docker-jumphost are specifically to accomodate attaching a single user to an alternative network namespace.
-For example, let's say you are using ekristen/openvpn-client to isolate a VPN connection. You can then use this ssh server to provide a jumphost into that network namespace.
-
-```
-docker run --net container:openvpn -d -e USER=`whoami` -v ~/.ssh/pubkeys/:/keys geekinutah/ssh-jumphost
+```sh
+# using the default user jump
+docker run --name ssh_server -d -e AUTH_KEY_0="..." -e AUTH_KEY_1="..." ghcr.io/zaro/docker-ssh-jump
 ```
