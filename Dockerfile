@@ -1,8 +1,8 @@
-FROM alpine:3.12.0
+FROM alpine:3.18
 
 ENV TERM=xterm-256color
 
-RUN apk add --no-cache openssh-server-pam bash && \
+RUN apk add --no-cache openssh openssh-server-pam bash && \
     mkdir /var/run/sshd
 
 VOLUME ["/keys"]
